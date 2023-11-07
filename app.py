@@ -1,16 +1,48 @@
+import io
+
 import streamlit as st
 import pandas as pd
 import duckdb as db
 
-data = {"article": [1, 2, 3, 4], "prix": [40, 50, 60, 30]}
-df = pd.DataFrame(data)
+csv1 ="""
+beverage, price
+orange juice, 2.5
+expresso,1.5
+tea, 2
+"""
+beverages = pd.read_csv(io.StringIO(csv1))
 
-st.write("Interpréteur sql")
-tab1 = st.tabs(["SQL"])
+csv2 ="""
+food_item, price
+cookie, 4
+flan,2.5
+muffin, 3
+"""
+food_items = pd.read_csv(io.StringIO(csv2))
 
-st.write("Le dataframe (df) de départ :")
-st.dataframe(df)
-query = st.text_area(label="Entrez votre commande SQL")
-st.write(f"Vous avez entré la query suivante : {query}")
+answer = """
+SELECT * FROM beverages
+CROSS JOIN food_items
+"""
 
-st.write(db.sql(query).df())
+solution = db.sql(answer).df()
+
+
+st.header("Enter your code")
+
+query = st.text_area(label="Type your code here...", key='user_input')
+if query:
+    st.write(db.sql(query).df())
+
+tab1, tab2 = st.tabs(["Tables","Solution"])
+
+with tab1:
+    st.write('table : beverages')
+    st.dataframe(beverages)
+    st.write('table : food_items')
+    st.dataframe(food_items)
+    st.write('expected')
+    st.dataframe(solution)
+
+with tab2:
+    st.write(answer)
