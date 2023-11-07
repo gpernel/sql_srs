@@ -27,6 +27,20 @@ CROSS JOIN food_items
 
 solution = db.sql(answer).df()
 
+st.write("""
+## SQL SRS
+Spaced Repetition System SQL practice
+
+""")
+
+with st.sidebar:
+    option = st.selectbox(
+        "What would you like to review ?",
+        ("Join","GroupBy","Windows Functions"),
+        index=None,
+        placeholder='Select a theme...'
+    )
+    st.write('you selected: ', option)
 
 st.header("Enter your code")
 
