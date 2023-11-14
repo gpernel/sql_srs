@@ -1,17 +1,12 @@
 # pylint: disable=missing-module-docstring
-
+import ast
 import duckdb as db
 import streamlit as st
 
+
 con = db.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
 
-ASWER_STR = """
-SELECT * FROM beverages
-CROSS JOIN food_items
-"""
-
 # solution_df = db.sql(ASWER_STR).df()
-
 st.write(
     """
 ## SQL SRS
@@ -37,9 +32,9 @@ st.header("Enter your code")
 query = st.text_area(label="Type your code here...", key="user_input")
 
 
-# if query:
-#     result = db.sql(query).df()
-#     st.write(result)
+if query:
+    result = con.execute(query).df()
+    st.write(result)
 #
 #     # test de la longeur des colonnes pour pouvoir donner des messages d'erreurs adéquats
 #     if len(result.columns) != len(solution_df.columns):
@@ -56,16 +51,19 @@ query = st.text_area(label="Type your code here...", key="user_input")
 #         st.write(
 #             f"results has {n_lines_differencies} lines diffrence with the solution_df"
 #         )
-#
-# tab1, tab2 = st.tabs(["Tables", "Solution"])
-#
-# with tab1:
-#     st.write("table : beverages")
-#     st.dataframe(beverages)
-#     st.write("table : food_items")
-#     st.dataframe(food_items)
-#     st.write("expected")
-#     st.dataframe(solution_df)
-#
-# with tab2:
-#     st.write(ASWER_STR)
+
+tab1, tab2 = st.tabs(["Tables", "Solution"])
+
+with tab1:
+    exercise_tables = ast.literal_eval(exercise.loc[0, "tables"])
+    for table in exercise_tables:
+        st.write(f"table :'{table}'")
+        df_table = con.execute(f"SELECT * FROM '{table}'").df()
+        st.dataframe(df_table)
+
+
+with tab2:
+    exercise_name = exercise.loc[0, "exercise_name"]
+    with open(f"answers/{exercise_name}", "r") as f:
+        answer = f.read()
+    st.write(answer)
