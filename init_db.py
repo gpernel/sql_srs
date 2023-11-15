@@ -24,7 +24,7 @@ con.execute("CREATE TABLE IF NOT EXISTS memory_state AS SELECT * FROM memory_sta
 #----------------------------------------------------------
 
 CV1 = """
-beverage, price
+beverage, price_b
 orange juice, 2.5
 expresso,1.5
 tea, 2
@@ -33,7 +33,7 @@ beverages = pd.read_csv(io.StringIO(CV1))
 con.execute("CREATE TABLE IF NOT EXISTS beverages AS SELECT * FROM beverages")
 
 CV2 = """
-food_item, price
+food_item, price_f
 cookie, 4
 flan,2.5
 muffin, 3

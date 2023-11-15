@@ -6,7 +6,7 @@ import streamlit as st
 
 con = db.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
 
-# solution_df = db.sql(ASWER_STR).df()
+
 st.write(
     """
 ## SQL SRS
@@ -26,6 +26,10 @@ with st.sidebar:
     exercise = con.execute(f"SELECT * FROM memory_state WHERE theme ='{theme}' ").df()
     st.write(exercise)
 
+    exercise_name = exercise.loc[0, "exercise_name"]
+    with open(f"answers/{exercise_name}.sql", "r") as f:
+        answer = f.read()
+    solution_df = con.execute(answer).df()
 
 st.header("Enter your code")
 
@@ -35,22 +39,19 @@ query = st.text_area(label="Type your code here...", key="user_input")
 if query:
     result = con.execute(query).df()
     st.write(result)
-#
-#     # test de la longeur des colonnes pour pouvoir donner des messages d'erreurs adéquats
-#     if len(result.columns) != len(solution_df.columns):
-#         st.write("Some columns are missing")
-#     try:
-#         result = result[solution_df.columns]
-#         st.dataframe(result.compare(solution_df))
-#     except KeyError as e:
-#         st.write("Some columns are missing")
-#
-#     # test de la longeur du dataframe
-#     n_lines_differencies = result.shape[0] - solution_df.shape[0]
-#     if n_lines_differencies != 0:
-#         st.write(
-#             f"results has {n_lines_differencies} lines diffrence with the solution_df"
-#         )
+
+    try:
+        result = result[solution_df.columns]
+        st.dataframe(result.compare(solution_df))
+    except KeyError as e:
+        st.write("Some columns are missing")
+
+    # test de la longueur du dataframe
+    n_line_differences = result.shape[0] - solution_df.shape[0]
+    if n_line_differences != 0:
+        st.write(
+            f"result has {n_line_differences} lines difference with the solution"
+        )
 
 tab1, tab2 = st.tabs(["Tables", "Solution"])
 
@@ -63,7 +64,4 @@ with tab1:
 
 
 with tab2:
-    exercise_name = exercise.loc[0, "exercise_name"]
-    with open(f"answers/{exercise_name}", "r") as f:
-        answer = f.read()
-    st.write(answer)
+    st.text(answer)
