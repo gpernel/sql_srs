@@ -61,3 +61,5 @@ Lewis
 """
 marques = pd.read_csv(io.StringIO(CSV_MARQUES))
 con.execute("CREATE TABLE IF NOT EXISTS marques AS SELECT * FROM marques")
+
+con.close()
